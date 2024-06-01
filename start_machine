@@ -25,7 +25,7 @@ else
 fi
 
 # Run nmap scan
-nmap -sC -sV -vv -oA "$TARGET_DIR/nmap_Scan" "$MACHINE_IP"
+nmap -sC -sV -vv -oA "$TARGET_DIR/scan" "$MACHINE_IP"
 
 # Check if the nmap command was successful
 if [ $? -eq 0 ]; then
