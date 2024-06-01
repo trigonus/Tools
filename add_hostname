@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Check if the correct number of arguments are provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <hostname> <ip address>"
+    exit 1
+fi
+
+# Assign arguments to variables
+HOSTNAME=$1
+IP_ADDRESS=$2
+
+# Add the hostname and IP address to /etc/hosts
+echo "$IP_ADDRESS $HOSTNAME" | sudo tee -a /etc/hosts > /dev/null
+
+# Check if the command was successful
+if [ $? -eq 0 ]; then
+    echo "Successfully added $HOSTNAME with IP $IP_ADDRESS to /etc/hosts."
+else
+    echo "Failed to add $HOSTNAME to /etc/hosts."
+    exit 1
+fi

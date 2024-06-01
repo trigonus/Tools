@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Check if the correct number of arguments are provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <machine name> <machine ip>"
+    exit 1
+fi
+
+# Assign arguments to variables
+MACHINE_NAME=$1
+MACHINE_IP=$2
+
+# Define the target directory
+TARGET_DIR="/root/Documents/${MACHINE_NAME}_${MACHINE_IP}"
+
+# Create the directory
+mkdir -p "$TARGET_DIR"
+
+# Check if the directory was created successfully
+if [ $? -eq 0 ]; then
+    echo "Directory ${TARGET_DIR} created successfully."
+else
+    echo "Failed to create directory ${TARGET_DIR}."
+    exit 1
+fi
+
+# Run nmap scan
+nmap -sC -sV -vv -oA "$TARGET_DIR/nmap_Scan" "$MACHINE_IP"
+
+# Check if the nmap command was successful
+if [ $? -eq 0 ]; then
+    echo "Nmap scan completed successfully."
+else
+    echo "Nmap scan failed."
+    exit 1
+fi

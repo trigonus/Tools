@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Function to print usage
+print_usage() {
+    echo "Usage: $0 <machine ip> <port> <hostname> [-fs <filter size>] [<dynamic flag> <value>]"
+    exit 1
+}
+
+# Check if the correct minimum number of arguments are provided
+if [ "$#" -lt 3 ]; then
+    print_usage
+fi
+
+# Assign mandatory arguments to variables
+MACHINE_IP=$1
+PORT=$2
+HOSTNAME=$3
+shift 3
+
+# Initialize optional arguments
+FILTER_SIZE=""
+DYNAMIC_FLAGS=""
+
+# Parse optional arguments
+while (( "$#" )); do
+    case "$1" in
+        -fs)
+            if [ -n "$2" ] && [ "$2" -eq "$2" ] 2>/dev/null; then
+                FILTER_SIZE="-fs $2"
+                shift 2
+            else
+                echo "Error: -fs requires a numerical argument."
+                print_usage
+            fi
+            ;;
+        *)
+            if [ -n "$2" ]; then
+                DYNAMIC_FLAGS="$DYNAMIC_FLAGS $1 $2"
+                shift 2
+            else
+                echo "Error: $1 requires an argument."
+                print_usage
+            fi
+            ;;
+    esac
+done
+
+# Run ffuf subdomain fuzzing scan
+ffuf -u "http://$MACHINE_IP:$PORT/" -H "Host: FUZZ.$HOSTNAME" -w /opt/SecLists/Discovery/Web-Content/raft-small-words-lowercase.txt $FILTER_SIZE $DYNAMIC_FLAGS
+
+# Check if the ffuf command was successful
+if [ $? -eq 0 ]; then
+    echo "FFUF subdomain scan completed successfully."
+else
+    echo "FFUF subdomain scan failed."
+    exit 1
+fi
